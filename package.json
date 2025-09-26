@@ -1,0 +1,31 @@
+{
+  "name": "cordova-plugin-system-bars",
+  "version": "1.0.0",
+  "main": "www/SystemBars.js",
+  "types": "www/SystemBars.d.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "cordova",
+    "edge-to-edge",
+    "edgetoedge",
+    "ete",
+    "e2e",
+    "system bars"
+  ],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "cordova": {
+    "id": "cordova-plugin-system-bars",
+    "platforms": [
+      "android"
+    ]
+  },
+  "engines": {
+    "cordovaDependencies": {
+        "1.0.0": { "cordova-android": ">8.0.0"}
+    }
+}
+}

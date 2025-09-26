@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
+    id="cordova-plugin-system-bars"
+    version="1.0.0">
+    <name>System-Bars</name>
+    <description>A Cordova plugin that is aimed to replace the existing status bar plugin and
+        support a more modern approach to handling of system bars.</description>
+    <license>Apache 2.0</license>
+    <js-module src="www/SystemBars.js" name="SystemBars">
+        <clobbers target="SystemBars" />
+    </js-module>
+    <platform name="android">
+        <config-file target="config.xml" parent="/*">
+            <feature name="SystemBars">
+                <param name="android-package" value="org.apache.cordova.systemBars.SystemBars" />
+            </feature>
+        </config-file>
+        <source-file src="src/android/SystemBars.java"
+            target-dir="src/org/apache/cordova/systemBars" />
+        <resource-file src="src/android/res/values/styles.xml" target="res/values/styles.xml" />
+
+        <edit-config file="AndroidManifest.xml"
+            target="/manifest/application/activity[@android:name='MainActivity']" mode="merge">
+            <activity android:theme="@style/Theme.App.EdgeToEdge.SplashScreen" />
+        </edit-config>
+
+    </platform>
+    <platform name="ios">
+        <config-file target="*-Info.plist" parent="/*">
+            <key>UIViewControllerBasedStatusBarAppearance</key>
+            <false />
+        </config-file>
+        <source-file src="src/ios/SystemBars.m" />
+        <config-file target="config.xml" parent="/*">
+            <feature name="SystemBars">
+                <param name="ios-package" value="SystemBars" />
+            </feature>
+        </config-file>
+    </platform>
+</plugin>
