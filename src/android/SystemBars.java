@@ -69,9 +69,6 @@ public class SystemBars extends CordovaPlugin {
     }
 
     private String getCssInsetJsString(String inset, int size) {
-        // TODOASDF: Inject --status-bar-height, tell JOEY if top, need to check the
-        // current injection to make sure it matches 1:1 so outsystemsUI isn't broken
-
         return "document.documentElement.style.setProperty('--safe-area-inset-" + inset + "', '" + size + "px');";
     }
 
