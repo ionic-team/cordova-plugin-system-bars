@@ -20,12 +20,12 @@ npx cordova plugin add cordova-plugin-system-bars
 Sets the style of the system bar glyphs (e.g., clock, battery, navigation icons).
 
 - `insetGlyphStyle`: `"light"` or `"dark"`.
-- `inset` (optional): `"top"` or `"bottom"`. If not provided, the style is applied to all system bars. If styling bottom, it only works if you are using three button navigation
+- `inset` (optional): `"top"` or `"bottom"`. If not provided, the style is applied to all system bars. If styling bottom, it only works if you are using three button navigation on most versions of android. It doesn't work on iOS.
 
 **Example:**
 
 ```javascript
-// Set status bar icons style to dark, which will make the icons light
+// Set status bar icons style to dark
 SystemBars.setStyle('dark', 'top');
 
 // Set navigation bar icons to be light
