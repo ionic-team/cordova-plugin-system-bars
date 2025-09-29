@@ -64,7 +64,9 @@ public class SystemBars extends CordovaPlugin {
         String js = getCssInsetJsString("top", topPx)
                 + getCssInsetJsString("right", rightPx)
                 + getCssInsetJsString("bottom", bottomPx)
-                + getCssInsetJsString("left", leftPx);
+                + getCssInsetJsString("left", leftPx)
+                //Legacy injection for --status-bar-height since we are removing the status bar
+                + "document.documentElement.style.setProperty('--status-bar-height', '" + topPx + "px');";
         activity.runOnUiThread(() -> webView.loadUrl("javascript:" + js));
     }
 
