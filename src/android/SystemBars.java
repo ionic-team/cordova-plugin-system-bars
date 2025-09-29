@@ -21,13 +21,19 @@ import org.apache.cordova.PluginResult;
 import org.json.JSONArray;
 import org.json.JSONException;
 
+//    we need to inject the existing --status-bar-height css variable (since we are removing the status bar)
+//    we are adding a new extensibility SystemBarsStyle
+
 public class SystemBars extends CordovaPlugin {
+    private String currentStyle = "dark";
 
     @Override
     protected void pluginInitialize() {
         Activity activity = this.cordova.getActivity();
         Window window = activity.getWindow();
         View decorView = window.getDecorView();
+
+        this.setStyle(preferences.getString("SystemBarsStyle", currentStyle).toLowerCase(), null);
 
         decorView.setOnApplyWindowInsetsListener((v, insets) -> setupSafeAreaInsets(insets));
     }
@@ -59,11 +65,13 @@ public class SystemBars extends CordovaPlugin {
                 + getCssInsetJsString("right", rightPx)
                 + getCssInsetJsString("bottom", bottomPx)
                 + getCssInsetJsString("left", leftPx);
-
         activity.runOnUiThread(() -> webView.loadUrl("javascript:" + js));
     }
 
     private String getCssInsetJsString(String inset, int size) {
+        // TODOASDF: Inject --status-bar-height, tell JOEY if top, need to check the
+        // current injection to make sure it matches 1:1 so outsystemsUI isn't broken
+
         return "document.documentElement.style.setProperty('--safe-area-inset-" + inset + "', '" + size + "px');";
     }
 
@@ -102,12 +110,14 @@ public class SystemBars extends CordovaPlugin {
         if (action.equals("setHidden")) {
             boolean hideInset = args.getBoolean(0);
             String inset = args.isNull(1) ? null : args.getString(1);
-            this.setHidden(hideInset, inset, callbackContext);
+            this.setHidden(hideInset, inset);
+            callbackContext.success("setHidden executed");
             return true;
         } else if (action.equals("setStyle")) {
             String style = args.getString(0).toLowerCase();
             String inset = args.isNull(1) ? null : args.getString(1);
-            this.setStyle(style, inset, callbackContext);
+            this.setStyle(style, inset);
+            callbackContext.success("setStyle executed");
             return true;
         } else if (action.equals("_ready")) {
             initialSetup();
@@ -116,7 +126,7 @@ public class SystemBars extends CordovaPlugin {
         return false;
     }
 
-    private void setHidden(boolean hideInset, String inset, CallbackContext callbackContext) {
+    private void setHidden(boolean hideInset, String inset) {
         Activity activity = this.cordova.getActivity();
         Window window = activity.getWindow();
 
@@ -144,12 +154,12 @@ public class SystemBars extends CordovaPlugin {
                 Log.d("SystemBars", "Inset '" + inset + "' not yet supported on Android");
             }
         });
-        callbackContext.success("setHidden executed");
     }
 
-    private void setStyle(String style, String inset, CallbackContext callbackContext) {
+    private void setStyle(String style, String inset) {
         // Android sets content the opposite of statusBarAppearance, so this is flipped
-        // for that reason to make the api consistant vs ios
+        // for that reason to make the api consistent vs ios
+        currentStyle = style;
         boolean setIconsLight = "dark".equalsIgnoreCase(style);
         Activity activity = this.cordova.getActivity();
         Window window = activity.getWindow();
@@ -159,12 +169,11 @@ public class SystemBars extends CordovaPlugin {
                     window.getDecorView());
             if (inset == null || "top".equalsIgnoreCase(inset)) {
                 insetsController.setAppearanceLightStatusBars(setIconsLight);
-           }
+            }
 
             if (inset == null || "bottom".equalsIgnoreCase(inset)) {
                 insetsController.setAppearanceLightNavigationBars(setIconsLight);
-           }
+            }
         });
-        callbackContext.success("setStyle executed");
     }
 }

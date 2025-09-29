@@ -72,6 +72,24 @@
 @end
 
 @implementation SystemBars
+
+- (void)pluginInitialize {
+    [super pluginInitialize];
+    
+    NSString *currentStyle = [self.commandDelegate.settings objectForKey:[@"SystemBarsStyle" lowercaseString]];
+
+    if (!currentStyle) {
+        currentStyle = @"DARK";
+    }
+
+    
+    CDVInvokedUrlCommand *mockJavascriptCall = [[CDVInvokedUrlCommand alloc] initWithArguments:@[currentStyle, @"all"] 
+                                                                             callbackId:nil 
+                                                                             className:@"SystemBars" 
+                                                                             methodName:@"setStyle"];
+    [self setStyle:mockJavascriptCall];
+}
+
 - (void)setStyle:(CDVInvokedUrlCommand*)command {
     NSString *style = [command.arguments objectAtIndex:0];
     id insetArg = [command.arguments objectAtIndex:1];
@@ -86,10 +104,11 @@
         newStyle = UIStatusBarStyleLightContent;
     }
 
-
     if([inset caseInsensitiveCompare:@"top"] == NSOrderedSame || [inset caseInsensitiveCompare:@"all"] == NSOrderedSame) {
         ((CDVViewController*)self.viewController).systemBarsStyle = @(newStyle);
-        [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK] callbackId:command.callbackId];
+        if (command.callbackId) {
+            [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK] callbackId:command.callbackId];
+        }
     }
 }
 
