@@ -13,12 +13,12 @@ declare namespace SystemBars {
 
   /**
    * Sets the style of the system bar glyphs.
-   * @param insetGlyphStyle The style to set ('light' or 'dark').
+   * @param insetGlyphStyle The style to set ('LIGHT', 'DARK' or 'DEFAULT').
    * @param inset The specific inset to style. If not provided, all insets are styled.
    */
   function setStyle(
-    insetGlyphStyle: "light" | "dark",
-    inset?: "top" | "bottom"
+    insetGlyphStyle: "LIGHT" | "DARK" | "DEFAULT",
+    inset?: "TOP" | "BOTTOM"
   ): void;
 
   /**
@@ -28,7 +28,7 @@ declare namespace SystemBars {
    */
   function setHidden(
     hideInset: boolean,
-    inset?: "top" | "bottom" | "left" | "right"
+    inset?: "TOP" | "BOTTOM" | "LEFT" | "RIGHT"
   ): void;
 }
 

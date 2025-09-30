@@ -1,5 +1,6 @@
 package org.apache.cordova.systemBars;
 
+import android.content.res.Configuration;
 import android.graphics.Color;
 import android.os.Build;
 
@@ -21,11 +22,8 @@ import org.apache.cordova.PluginResult;
 import org.json.JSONArray;
 import org.json.JSONException;
 
-//    we need to inject the existing --status-bar-height css variable (since we are removing the status bar)
-//    we are adding a new extensibility SystemBarsStyle
-
 public class SystemBars extends CordovaPlugin {
-    private String currentStyle = "dark";
+    private String currentStyle = "DEFAULT";
 
     @Override
     protected void pluginInitialize() {
@@ -61,17 +59,17 @@ public class SystemBars extends CordovaPlugin {
         int bottomPx = (int) (bottom / density);
         int leftPx = (int) (left / density);
 
-        String js = getCssInsetJsString("top", topPx)
-                + getCssInsetJsString("right", rightPx)
-                + getCssInsetJsString("bottom", bottomPx)
-                + getCssInsetJsString("left", leftPx)
+        String js = getCssInsetJsString("TOP", topPx)
+                + getCssInsetJsString("RIGHT", rightPx)
+                + getCssInsetJsString("BOTTOM", bottomPx)
+                + getCssInsetJsString("LEFT", leftPx)
                 //Legacy injection for --status-bar-height since we are removing the status bar
                 + "document.documentElement.style.setProperty('--status-bar-height', '" + topPx + "px');";
         activity.runOnUiThread(() -> webView.loadUrl("javascript:" + js));
     }
 
     private String getCssInsetJsString(String inset, int size) {
-        return "document.documentElement.style.setProperty('--safe-area-inset-" + inset + "', '" + size + "px');";
+        return "document.documentElement.style.setProperty('--safe-area-inset-" + inset.toLowerCase() + "', '" + size + "px');";
     }
 
     private void initialSetup() {
@@ -137,9 +135,9 @@ public class SystemBars extends CordovaPlugin {
 
             if (inset == null) {
                 insetTypes = WindowInsetsCompat.Type.systemBars();
-            } else if ("top".equalsIgnoreCase(inset)) {
+            } else if ("TOP".equalsIgnoreCase(inset)) {
                 insetTypes = WindowInsetsCompat.Type.statusBars();
-            } else if ("bottom".equalsIgnoreCase(inset)) {
+            } else if ("BOTTOM".equalsIgnoreCase(inset)) {
                 insetTypes = WindowInsetsCompat.Type.navigationBars();
             }
 
@@ -149,29 +147,40 @@ public class SystemBars extends CordovaPlugin {
                 insetsController.show(insetTypes);
             }
 
-            if ("left".equalsIgnoreCase(inset) || "right".equalsIgnoreCase(inset)) {
+            if ("LEFT".equalsIgnoreCase(inset) || "RIGHT".equalsIgnoreCase(inset)) {
                 Log.d("SystemBars", "Inset '" + inset + "' not yet supported on Android");
             }
         });
     }
 
+    private boolean isSystemInDarkMode() {
+        Activity activity = this.cordova.getActivity();
+        int nightModeFlags = activity.getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
+        return nightModeFlags == Configuration.UI_MODE_NIGHT_YES;
+    }
+
     private void setStyle(String style, String inset) {
-        // Android sets content the opposite of statusBarAppearance, so this is flipped
-        // for that reason to make the api consistent vs ios
         currentStyle = style;
-        boolean setIconsLight = "dark".equalsIgnoreCase(style);
+        boolean setContentDark;
+        
+        if ("DEFAULT".equalsIgnoreCase(style)) {
+            setContentDark = isSystemInDarkMode();
+        } else {
+            setContentDark = "DARK".equalsIgnoreCase(style);
+        }
+        
         Activity activity = this.cordova.getActivity();
         Window window = activity.getWindow();
 
         activity.runOnUiThread(() -> {
             WindowInsetsControllerCompat insetsController = WindowCompat.getInsetsController(window,
                     window.getDecorView());
-            if (inset == null || "top".equalsIgnoreCase(inset)) {
-                insetsController.setAppearanceLightStatusBars(setIconsLight);
+            if (inset == null || "TOP".equalsIgnoreCase(inset)) {
+                insetsController.setAppearanceLightStatusBars(setContentDark);
             }
 
-            if (inset == null || "bottom".equalsIgnoreCase(inset)) {
-                insetsController.setAppearanceLightNavigationBars(setIconsLight);
+            if (inset == null || "BOTTOM".equalsIgnoreCase(inset)) {
+                insetsController.setAppearanceLightNavigationBars(setContentDark);
             }
         });
     }
